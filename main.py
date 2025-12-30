@@ -193,16 +193,21 @@ class LinuxDoBrowser:
         if not topic_list:
             logger.error("未找到主题帖")
             return False
-        logger.info(f"发现 {len(topic_list)} 个主题帖，随机选择10个")
-        for topic in random.sample(topic_list, 10):
+        self.like_count = 0
+        logger.info(f"发现 {len(topic_list)} 个主题帖，随机选择50个")
+        for topic in random.sample(topic_list, min(50, len(topic_list))):
             self.click_one_topic(topic.attr("href"))
+            if self.like_count >= 50:
+                logger.success(f"已完成50个点赞，停止浏览")
+                break
+        logger.info(f"总共点赞 {self.like_count} 个帖子")
         return True
 
     @retry_decorator()
     def click_one_topic(self, topic_url):
         new_page = self.browser.new_tab()
         new_page.get(topic_url)
-        if random.random() < 0.3:  # 0.3 * 30 = 9
+        if self.like_count < 50:
             self.click_like(new_page)
         self.browse_post(new_page)
         new_page.close()
@@ -260,7 +265,8 @@ class LinuxDoBrowser:
             if like_button:
                 logger.info("找到未点赞的帖子，准备点赞")
                 like_button.click()
-                logger.info("点赞成功")
+                self.like_count += 1
+                logger.info(f"点赞成功 ({self.like_count}/50)")
                 time.sleep(random.uniform(1, 2))
             else:
                 logger.info("帖子可能已经点过赞了")
