@@ -194,11 +194,11 @@ class LinuxDoBrowser:
             logger.error("未找到主题帖")
             return False
         self.like_count = 0
-        logger.info(f"发现 {len(topic_list)} 个主题帖，随机选择50个")
-        for topic in random.sample(topic_list, min(50, len(topic_list))):
+        logger.info(f"发现 {len(topic_list)} 个主题帖，随机选择20个")
+        for topic in random.sample(topic_list, min(20, len(topic_list))):
             self.click_one_topic(topic.attr("href"))
-            if self.like_count >= 50:
-                logger.success(f"已完成50个点赞，停止浏览")
+            if self.like_count >= 20:
+                logger.success(f"已完成20个点赞，停止浏览")
                 break
         logger.info(f"总共点赞 {self.like_count} 个帖子")
         return True
@@ -207,7 +207,7 @@ class LinuxDoBrowser:
     def click_one_topic(self, topic_url):
         new_page = self.browser.new_tab()
         new_page.get(topic_url)
-        if self.like_count < 50:
+        if self.like_count < 20:
             self.click_like(new_page)
         self.browse_post(new_page)
         new_page.close()
